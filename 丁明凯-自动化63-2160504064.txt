@@ -1,0 +1,58 @@
+-----------------------------------------
+主函数
+-----------------------------------------
+for i=1:6
+    [f0,f5]=edge_dec(i);
+    hough_dec(i,f5,f0);
+end
+    
+---------------------------------------------
+边缘检测子函数
+---------------------------------------------
+function [f0,f5]=edge_dec(num)
+switch num
+    case 1
+        pic_name='test1.tif';
+    case 2 
+        pic_name='test2.png';
+    case 3
+        pic_name='test3.jpg';
+    case 4
+        pic_name='test4.bmp';
+    case 5
+        pic_name='test5.png';
+    case 6
+        pic_name='test6.jpg';
+end
+fig=imread(pic_name);
+f0=fig(:,:,1);
+f1=edge(f0,'roberts');
+f2=edge(f0,'Sobel');
+f3=edge(f0,'Prewitt');
+f4=edge(f0,'LOG');
+f5=edge(f0,'Canny');
+figure(1)
+subplot(2,3,1);imshow(f0);title('原图');
+subplot(2,3,2);imshow(f1);title('robert算子');
+subplot(2,3,3);imshow(f2);title('sobel算子');
+subplot(2,3,4);imshow(f3);title('prewitt算子');
+subplot(2,3,5);imshow(f4);title('LOG算子');
+subplot(2,3,6);imshow(f5);title('canny算子');
+saveas(gcf,strcat('edge_dec/pic',num2str(num),'.bmp'))
+end
+---------------------------------
+直线检测子函数
+---------------------------------
+function []=hough_dec(num,pic,pic_name)
+[H_mat,Theta,R] = hough(pic);
+points = houghpeaks(H_mat,20);
+l_of_hough=houghlines(pic,Theta,R,points);
+figure(2);
+subplot(1,2,1);imshow(pic_name);title('原图');
+subplot(1,2,2);imshow(pic_name),hold on;
+for j = 1:length(l_of_hough)
+    poi = [l_of_hough(j).point1; l_of_hough(j).point2];
+    plot(poi(:,1),poi(:,2),'LineWidth',1,'Color','blue');
+end
+saveas(gcf,strcat('hough_dec/pic',num2str(num),'.bmp'))
+end
